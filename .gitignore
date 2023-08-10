@@ -10,4 +10,8 @@ dist
 src/teach/analysis/.ipynb_checkpoints/
 pip-wheel-metadata/
 *.pyc
+
+#Added by user (Not present in original repo) 
 data
+my_notes
+generations
