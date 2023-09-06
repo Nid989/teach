@@ -1,0 +1,150 @@
+#####Set default python version in Linux
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+...
+
+sudo update-alternatives --config python3
+
+
+#####Create env
+python3.8 -m venv envs/env_name
+
+#####Activate env
+source envs/env_name/bin/activate
+
+
+#####Downloading teach -> requires markupsafe==2.0.1
+werkzeug 2.2.3 depends on MarkupSafe>=2.1.1
+werkzeug 2.0.2 solved the problem
+
+teach_download -d data (uni/teach/ teach_download -d data)
+
+#####Errors in inference for sample model
+export DATA_DIR=/uni/teach/data
+export OUTPUT_DIR=/uni/teach/generations/sample_model/valid_seen
+export METRICS_FILE=/uni/teach/generations/sample_model/metric
+
+
+teach_inference \
+    --data_dir $DATA_DIR \
+    --output_dir $OUTPUT_DIR \
+    --split valid_seen \
+    --metrics_file $METRICS_FILE \
+    --model_module teach.inference.sample_model \
+    --model_class SampleModel
+    
+Throws error:
+usage: teach_inference [-h] --data_dir DATA_DIR --images_dir IMAGES_DIR [--use_img_file] --output_dir
+                       OUTPUT_DIR
+                       [--split {train,valid_seen,valid_unseen,test_seen,test_unseen,divided_val_seen,divided_val_unseen,divided_test_seen,divided_test_unseen}]
+                       [--num_processes NUM_PROCESSES] [--max_init_tries MAX_INIT_TRIES]
+                       [--max_traj_steps MAX_TRAJ_STEPS] [--max_api_fails MAX_API_FAILS]
+                       --metrics_file METRICS_FILE [--model_module MODEL_MODULE]
+                       [--model_class MODEL_CLASS] [--replay_timeout REPLAY_TIMEOUT]
+                       [--benchmark BENCHMARK] [--edh_instance_file EDH_INSTANCE_FILE]
+                       [--tfd_instance_file TFD_INSTANCE_FILE]
+teach_inference: error: the following arguments are required: --images_dir
+
+Add ./uni instead of /uni
+
+
+
+##### Running inference FINAL:
+Run from carbon@carbon (Root directory)
+
+export DATA_DIR=./uni/teach/data
+export OUTPUT_DIR=./uni/teach/generations/sample_model/valid_seen
+export METRICS_FILE=./uni/teach/generations/sample_model/metric
+export IMAGES_DIR=./uni/teach/data/images
+
+teach_inference \
+    --data_dir $DATA_DIR \
+    --images_dir $IMAGES_DIR\
+    --output_dir $OUTPUT_DIR \
+    --split valid_seen \
+    --metrics_file $METRICS_FILE \
+    --model_module teach.inference.sample_model \
+    --model_class SampleModel
+    
+    
+#####Error for Output directory
+[MainThread-6821-ERROR] teach.utils: Could not create directory: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+Traceback (most recent call last):
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 339, in save_dict_as_json
+    filepath.parent.mkdir(exist_ok=True)
+  File "/usr/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+ERROR:teach.utils:Could not create directory: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+Traceback (most recent call last):
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 339, in save_dict_as_json
+    filepath.parent.mkdir(exist_ok=True)
+  File "/usr/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+[MainThread-6821-ERROR] teach.inference.inference_runner_base: exception happened for instance=./uni/teach/data/edh_instances/valid_seen/38e166ac4f59b7a7_cf45.edh5.json, continue with the rest
+Traceback (most recent call last):
+  File "/home/carbon/uni/teach/src/teach/inference/inference_runner_base.py", line 123, in _run
+    instance_id, instance_metrics = self._run_instance(instance_file, config, model, er)
+  File "/home/carbon/uni/teach/src/teach/inference/inference_runner_base.py", line 253, in _run_instance
+    er.simulator.save(file_name=output_file)
+  File "/home/carbon/uni/teach/src/teach/simulators/simulator_THOR.py", line 450, in save
+    super().save(file_name=file_name)
+  File "/home/carbon/uni/teach/src/teach/simulators/simulator_base.py", line 651, in save
+    save_dict_as_json(data, filepath)
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 342, in save_dict_as_json
+    raise e
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 339, in save_dict_as_json
+    filepath.parent.mkdir(exist_ok=True)
+  File "/usr/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+ERROR:teach.inference.inference_runner_base:exception happened for instance=./uni/teach/data/edh_instances/valid_seen/38e166ac4f59b7a7_cf45.edh5.json, continue with the rest
+Traceback (most recent call last):
+  File "/home/carbon/uni/teach/src/teach/inference/inference_runner_base.py", line 123, in _run
+    instance_id, instance_metrics = self._run_instance(instance_file, config, model, er)
+  File "/home/carbon/uni/teach/src/teach/inference/inference_runner_base.py", line 253, in _run_instance
+    er.simulator.save(file_name=output_file)
+  File "/home/carbon/uni/teach/src/teach/simulators/simulator_THOR.py", line 450, in save
+    super().save(file_name=file_name)
+  File "/home/carbon/uni/teach/src/teach/simulators/simulator_base.py", line 651, in save
+    save_dict_as_json(data, filepath)
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 342, in save_dict_as_json
+    raise e
+  File "/home/carbon/uni/teach/src/teach/utils.py", line 339, in save_dict_as_json
+    filepath.parent.mkdir(exist_ok=True)
+  File "/usr/lib/python3.8/pathlib.py", line 1288, in mkdir
+    self._accessor.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'uni/teach/generations/sample_model/valid_seen/uni/teach/generations/sample_model/valid_seen'
+
+
+#####Cluster login
+sudo openconnect sslvpn.uni-potsdam.de
+ssh -p 22200 kkoshti@jarvis.ling.uni-potsdam.de
+mu3ceaequru4txep
+
+
+##### Train.py
+Added alfred directory to /src/ to resolve dependency issue
+export ET_ROOT=./uni/teach/src/teach/modeling/ET
+export ET_LOGS=./uni/teach/genrations/et_logs
+export ET_DATA=./uni/teach/data
+
+/home/carbon/uni/teach/src/alfred/config.py
+"train": "et", <- "train": None  (Line 34)
+
+
+Need to run create_lmdb.py before running train.py
+
+# vocab_path = "files/base.vocab"
+    vocab_path = None
+Line 58 - create_lmdb.py
+
+
+edh_instances backup on desktop
+
+Final error : create_lmdb, broken symlink
+
+replace : -> _
+115, 73
+This seems to have solved the problem, : is not a supported character for a filename
