@@ -12,7 +12,16 @@ pip-wheel-metadata/
 *.pyc
 
 #Added by user (Not present in original repo) 
-data
+data/all_game_files
+data/baseline_models
+data/edh_instances
+data/et_pretrained_models
+data/all_game_files
+data/images
+data/games
+data/lmdb_teach_edh
+data/tfd_instances
+data/._baseline_models
 my_notes
 launch.json
 generations
