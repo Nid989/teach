@@ -127,7 +127,7 @@ mu3ceaequru4txep
 ##### Train.py
 Added alfred directory to /src/ to resolve dependency issue
 export ET_ROOT=./uni/teach/src/teach/modeling/ET
-export ET_LOGS=./uni/teach/genrations/et_logs
+export ET_LOGS=./uni/teach/generations/et_logs
 export ET_DATA=./uni/teach/data
 
 /home/carbon/uni/teach/src/alfred/config.py
@@ -148,3 +148,17 @@ Final error : create_lmdb, broken symlink
 replace : -> _
 115, 73
 This seems to have solved the problem, : is not a supported character for a filename
+
+
+Problem in creating jsons.pkl
+Dataset from create_lmdb was not proper
+
+Changing from : to _ "everywhere", recreates the symlink problem again
+
+
+#TODO:
+
+Run create_lmdb, og feats in worker00/feats
+Synthetic training , you have the dataset
+
+

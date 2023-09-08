@@ -13,5 +13,8 @@ pip-wheel-metadata/
 
 #Added by user (Not present in original repo) 
 data
+my_notes/notes
+my_notes/Teach_sample_inf_op
+launch.json
 generations
 testttttt.py
