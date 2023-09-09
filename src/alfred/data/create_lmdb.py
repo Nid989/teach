@@ -33,11 +33,11 @@ def cfg_args():
     data_input = "edh_instances"
     task_type = "edh"
     # whether to overwrite old data in case it exists
-    overwrite = False
+    overwrite = True
     # number of processes to run the data processing in (0 for main thread)
     num_workers = 0
     # debug run with only 16 entries
-    fast_epoch = False
+    fast_epoch = True
 
     # VISUAL FEATURES SETTINGS
     # visual archi (resnet18, fasterrcnn, maskrcnn)
@@ -179,6 +179,7 @@ def run_in_parallel(func, num_workers, output_path, args, use_processes=False):
             thread.join()
 
 
+#########################MOD#########################################
 def gather_data(output_path, num_workers):
     logger = logging.getLogger(__name__)
     
