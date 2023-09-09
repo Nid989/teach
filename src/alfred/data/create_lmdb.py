@@ -33,7 +33,7 @@ def cfg_args():
     data_input = "edh_instances"
     task_type = "edh"
     # whether to overwrite old data in case it exists
-    overwrite = False
+    overwrite = True
     # number of processes to run the data processing in (0 for main thread)
     num_workers = 0
     # debug run with only 16 entries
@@ -82,17 +82,17 @@ def process_feats(traj_paths, extractor, lock, image_folder, save_path):
             )
         feat = data_util.extract_features(images, extractor)
         if feat is not None:
-#             torch.save(feat, save_path / "feats" / filename_new)
+            torch.save(feat, save_path / "feats" / filename_new)
             #########################MOD##########################
-            save_file_path = save_path / "feats" / filename_new
-            if os.path.exists(save_file_path):
-                print(f"File already exists: {save_file_path}")
-            else:
-                try:
-                    torch.save(feat, save_file_path)
-                    print(f"Saved: {save_file_path}")
-                except Exception as e:
-                    print(f"Error saving file {save_file_path}: {str(e)}")
+#             save_file_path = save_path / "feats" / filename_new
+#             if os.path.exists(save_file_path):
+#                 print(f"File already exists: {save_file_path}")
+#             else:
+#                 try:
+#                     torch.save(feat, save_file_path)
+#                     print(f"Saved: {save_file_path}")
+#                 except Exception as e:
+#                     print(f"Error saving file {save_file_path}: {str(e)}")
 
         with lock:
             with open(save_path.parents[0] / "processed_feats.txt", "a") as f:
@@ -147,7 +147,10 @@ def get_traj_paths(input_path, processed_files_path, fast_epoch):
         traj_paths_all = sorted([str(path) for path in input_path.glob("*/*.json")])
         traj_paths = traj_paths_all
     if fast_epoch:
-        traj_paths = traj_paths[::20]
+#         traj_paths = traj_paths[::20]
+        ######MOD##########
+        traj_paths = traj_paths[::400]
+        ###################
     num_files = len(traj_paths)
     if processed_files_path is not None and processed_files_path.exists():
         if str(processed_files_path).endswith(constants.VOCAB_FILENAME):
@@ -200,7 +203,10 @@ def gather_data(output_path, num_workers):
             logger.info("Processing %s trajectories" % partition)
             feats_files = output_path.glob("worker*/feats/{}:*.pt".format(partition))
             feats_files = sorted([str(path) for path in feats_files])
-            dest_partition_path = output_path / "feats" / partition
+#             dest_partition_path = output_path / "feats" / partition
+            ##########MOD2########
+            dest_partition_path = output_path / partition / "feats"
+            #####################
             dest_partition_path.mkdir(parents=True, exist_ok=True)
             for feat_file in feats_files:
                 dest_path = dest_partition_path / Path(feat_file).name
@@ -213,15 +219,15 @@ def gather_data(output_path, num_workers):
     logger.info("Removing worker directories")
     (output_path / ".deleting_worker_dirs").touch()
     
-#     for worker_idx in range(max(num_workers, 1)):
-#         worker_dir = output_path / "worker{:02d}".format(worker_idx)
-#         if worker_dir.is_dir():
-#             shutil.rmtree(worker_dir)
+    for worker_idx in range(max(num_workers, 1)):
+        worker_dir = output_path / "worker{:02d}".format(worker_idx)
+        if worker_dir.is_dir():
+            shutil.rmtree(worker_dir)
     
-#     for dirname in ("feats", "masks", "jsons"):
-#         dir_path = output_path / dirname
-#         if dir_path.is_dir():
-#             shutil.rmtree(dir_path)
+    for dirname in ("feats", "masks", "jsons"):
+        dir_path = output_path / dirname
+        if dir_path.is_dir():
+            shutil.rmtree(dir_path)
 
 
 @ex.automain
