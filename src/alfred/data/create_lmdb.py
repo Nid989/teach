@@ -82,8 +82,8 @@ def process_feats(traj_paths, extractor, lock, image_folder, save_path):
             )
         feat = data_util.extract_features(images, extractor)
         if feat is not None:
+#             torch.save(feat, save_path / "feats" / filename_new)
             #########################MOD##########################
-            # torch.save(feat, save_path / "feats" / filename_new)
             save_file_path = save_path / "feats" / filename_new
             if os.path.exists(save_file_path):
                 print(f"File already exists: {save_file_path}")
@@ -213,15 +213,15 @@ def gather_data(output_path, num_workers):
     logger.info("Removing worker directories")
     (output_path / ".deleting_worker_dirs").touch()
     
-    for worker_idx in range(max(num_workers, 1)):
-        worker_dir = output_path / "worker{:02d}".format(worker_idx)
-        if worker_dir.is_dir():
-            shutil.rmtree(worker_dir)
+#     for worker_idx in range(max(num_workers, 1)):
+#         worker_dir = output_path / "worker{:02d}".format(worker_idx)
+#         if worker_dir.is_dir():
+#             shutil.rmtree(worker_dir)
     
-    for dirname in ("feats", "masks", "jsons"):
-        dir_path = output_path / dirname
-        if dir_path.is_dir():
-            shutil.rmtree(dir_path)
+#     for dirname in ("feats", "masks", "jsons"):
+#         dir_path = output_path / dirname
+#         if dir_path.is_dir():
+#             shutil.rmtree(dir_path)
 
 
 @ex.automain

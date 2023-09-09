@@ -6,18 +6,18 @@ import shutil
 import numpy as np
 import torch
 
-from teach.modeling.ET.alfred import constants
-from teach.modeling.ET.alfred.config import exp_ingredient, train_ingredient
-from teach.modeling.ET.alfred.data import GuidesEdhDataset, GuidesSpeakerDataset
-from teach.modeling.ET.alfred.model.learned import LearnedModel
-from teach.modeling.ET.alfred.utils import data_util, helper_util, model_util
+# from teach.modeling.ET.alfred import constants
+# from teach.modeling.ET.alfred.config import exp_ingredient, train_ingredient
+# from teach.modeling.ET.alfred.data import GuidesEdhDataset, GuidesSpeakerDataset
+# from teach.modeling.ET.alfred.model.learned import LearnedModel
+# from teach.modeling.ET.alfred.utils import data_util, helper_util, model_util
 # os.chdir('./ET')
 
-# from alfred import constants
-# from alfred.config import exp_ingredient, train_ingredient
-# from alfred.data import GuidesEdhDataset, GuidesSpeakerDataset
-# from alfred.model.learned import LearnedModel
-# from alfred.utils import data_util, helper_util, model_util
+from alfred import constants
+from alfred.config import exp_ingredient, train_ingredient
+from alfred.data import GuidesEdhDataset, GuidesSpeakerDataset
+from alfred.model.learned import LearnedModel
+from alfred.utils import data_util, helper_util, model_util
 from sacred import Experiment
 
 from teach.logger import create_logger
