@@ -33,7 +33,7 @@ def cfg_args():
     data_input = "edh_instances"
     task_type = "edh"
     # whether to overwrite old data in case it exists
-    overwrite = True
+    overwrite = False
     # number of processes to run the data processing in (0 for main thread)
     num_workers = 0
     # debug run with only 16 entries
