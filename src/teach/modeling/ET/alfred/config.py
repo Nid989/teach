@@ -13,7 +13,7 @@ SETTINGS.CONFIG.READ_ONLY_CONFIG = False
 def cfg_exp():
     # HIGH-LEVEL MODEL SETTINGS
     # where to save model and/or logs
-    name = "default"
+    name = "et_bart"
     # model to use
     model = "transformer"
     # which device to use
@@ -209,6 +209,13 @@ def cfg_train():
         "token": False,
         # dataset id learned encoding
         "dataset": False,
+    }
+
+    # ENCODER TYPE
+    encoder_type = {
+        # Which BART Type to use, or use base transformer encoder layer
+        # BASE, BART, BART_SYNTH (Finetuned on ET synthetic data)
+        "TYPE" : "BART"
     }
 
     use_alfred_weights = False

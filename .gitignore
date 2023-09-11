@@ -27,3 +27,4 @@ launch.json
 generations
 testttttt.py
 data/flickr30k_images
+.vscode/settings.json
