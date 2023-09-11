@@ -19,11 +19,11 @@ def cfg_exp():
     # which device to use
     device = "cuda"
     # number of data loading workers or evaluation processes (0 for main thread)
-    num_workers = 12
+    num_workers = 0
     # we can fine-tune a pre-trained model
     pretrained_path = None
     # run the code on a small chunk of data
-    fast_epoch = False
+    fast_epoch = True
 
     # Set this to 1 if running on a Mac and to large numbers like 250 if running on EC2
     lmdb_max_readers = 1
@@ -31,7 +31,7 @@ def cfg_exp():
     # DATA SETTINGS
     data = {
         # dataset name(s) for training and validation
-        "train": None,
+        "train": "lmdb_teach_edh",
         # additional dataset name(s) can be specified for validation only
         "valid": "",
         # specify the length of each dataset
@@ -153,7 +153,7 @@ def cfg_train():
     entropy_wt = 0.0
 
     # Should train loss be computed over history actions? (default False)
-    compute_train_loss_over_history = False
+    compute_train_loss_over_history = True
 
     # TRANSFORMER settings
     # size of transformer embeddings
