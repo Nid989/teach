@@ -13,7 +13,7 @@ SETTINGS.CONFIG.READ_ONLY_CONFIG = False
 def cfg_exp():
     # HIGH-LEVEL MODEL SETTINGS
     # where to save model and/or logs
-    name = "et_bart"
+    name = "et_bart_fast"
     # model to use
     model = "transformer"
     # which device to use
@@ -157,9 +157,9 @@ def cfg_train():
 
     # TRANSFORMER settings
     # size of transformer embeddings
-    demb = 768
+    demb = 1024 #768
     # number of heads in multi-head attention
-    encoder_heads = 12
+    encoder_heads = 16 #12
     # number of layers in transformer encoder
     encoder_layers = 2
     # how many previous actions to use as input
@@ -174,8 +174,8 @@ def cfg_train():
     # which decoder to use for the speaker model
     decoder_lang = {
         "layers": 2,
-        "heads": 12,
-        "demb": 768,
+        "heads": 16, #12,
+        "demb": 1024, #768
         "dropout": 0.1,
         "pos_enc": True,
     }

@@ -122,11 +122,12 @@ class EncoderLangBART(nn.Module):
         """
     
         # Encode the input using BART
-        outputs = self.bart_model(lang_pad)
-        hiddens = outputs.last_hidden_state
+        outputs = self.bart_model(lang_pad, return_dict=True)
+        hiddens = outputs.encoder_last_hidden_state
 
         # Compute lengths of non-padded sequences
-        lengths = (lang_pad != self.tokenizer.pad_token_id).sum(dim=1)
+        lengths = torch.tensor([lang_pad.shape[1]] * lang_pad.shape[0])
+#         lengths = (lang_pad != self.tokenizer.pad_token_id).sum(dim=1)
 
         return hiddens, lengths
 

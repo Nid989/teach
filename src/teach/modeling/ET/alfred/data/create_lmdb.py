@@ -28,7 +28,7 @@ ex = Experiment("create_data", ingredients=[args_ingredient])
 @args_ingredient.config
 def cfg_args():
     # name of the output dataset
-    data_output = "lmdb_teach_edh"
+    data_output = "lmdb_teach_edh_all"
     # where to load the original ALFRED dataset images and jsons from
     data_input = "edh_instances"
     task_type = "edh"
@@ -37,7 +37,7 @@ def cfg_args():
     # number of processes to run the data processing in (0 for main thread)
     num_workers = 0
     # debug run with only 16 entries
-    fast_epoch = True
+    fast_epoch = False
 
     # VISUAL FEATURES SETTINGS
     # visual archi (resnet18, fasterrcnn, maskrcnn)
