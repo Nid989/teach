@@ -13,7 +13,7 @@ SETTINGS.CONFIG.READ_ONLY_CONFIG = False
 def cfg_exp():
     # HIGH-LEVEL MODEL SETTINGS
     # where to save model and/or logs
-    name = "et_bart_fast"
+    name = "et_plus_bart_base"
     # model to use
     model = "transformer"
     # which device to use
@@ -31,7 +31,7 @@ def cfg_exp():
     # DATA SETTINGS
     data = {
         # dataset name(s) for training and validation
-        "train": "lmdb_teach_edh",
+        "train": "lmdb_teach_edh_all",
         # additional dataset name(s) can be specified for validation only
         "valid": "",
         # specify the length of each dataset
@@ -79,7 +79,7 @@ def cfg_eval():
     x_display = "0"
     # range of checkpoints to evaluate, (9, 20, 2) means epochs 9, 11, 13, 15, 17, 19
     # if None, only 'latest.pth' will be evaluated
-    eval_range = (9, 20, 1)
+    eval_range = (17, 20, 2)
     # object predictor path
     object_predictor = None
 
@@ -111,9 +111,9 @@ def cfg_train():
 
     # HYPER PARAMETERS
     # batch size
-    batch = 2 #8
+    batch = 8 #8
     # number of epochs
-    epochs = 1 #20
+    epochs = 20 #20
     # optimizer type, must be in ('adam', 'adamw')
     optimizer = "adamw"
     # L2 regularization weight
@@ -153,7 +153,7 @@ def cfg_train():
     entropy_wt = 0.0
 
     # Should train loss be computed over history actions? (default False)
-    compute_train_loss_over_history = False
+    compute_train_loss_over_history = True
 
     # TRANSFORMER settings
     # size of transformer embeddings
