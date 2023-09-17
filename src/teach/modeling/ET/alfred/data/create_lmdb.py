@@ -28,7 +28,7 @@ ex = Experiment("create_data", ingredients=[args_ingredient])
 @args_ingredient.config
 def cfg_args():
     # name of the output dataset
-    data_output = "lmdb_teach_edh_all"
+    data_output = "lmdb_teach_edh_maskrcnn"
     # where to load the original ALFRED dataset images and jsons from
     data_input = "edh_instances"
     task_type = "edh"
@@ -41,7 +41,7 @@ def cfg_args():
 
     # VISUAL FEATURES SETTINGS
     # visual archi (resnet18, fasterrcnn, maskrcnn)
-    visual_archi = "fasterrcnn"
+    visual_archi = "maskrcnn"
     # where to load a pretrained model from
     visual_checkpoint = None
     # which images to use (by default: RGBs)

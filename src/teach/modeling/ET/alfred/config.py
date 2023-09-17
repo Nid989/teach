@@ -153,7 +153,7 @@ def cfg_train():
     entropy_wt = 0.0
 
     # Should train loss be computed over history actions? (default False)
-    compute_train_loss_over_history = True
+    compute_train_loss_over_history = False
 
     # TRANSFORMER settings
     # size of transformer embeddings
