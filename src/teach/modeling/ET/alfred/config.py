@@ -111,9 +111,9 @@ def cfg_train():
 
     # HYPER PARAMETERS
     # batch size
-    batch = 8
+    batch = 2 #8
     # number of epochs
-    epochs = 20
+    epochs = 1 #20
     # optimizer type, must be in ('adam', 'adamw')
     optimizer = "adamw"
     # L2 regularization weight
@@ -157,9 +157,9 @@ def cfg_train():
 
     # TRANSFORMER settings
     # size of transformer embeddings
-    demb = 1024 #768
+    demb = 768 #1024 (LARGE)
     # number of heads in multi-head attention
-    encoder_heads = 16 #12
+    encoder_heads = 12 #16
     # number of layers in transformer encoder
     encoder_layers = 2
     # how many previous actions to use as input

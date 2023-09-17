@@ -107,7 +107,7 @@ class EncoderLangBART(nn.Module):
         self.goal_token = goal_token
 
         # BART-large model
-        model_name = "facebook/bart-large-cnn"
+        model_name = "facebook/bart-base"
         tokenizer = BartTokenizer.from_pretrained(model_name)
         model = BartForConditionalGeneration.from_pretrained(model_name)
         self.bart_model = model
