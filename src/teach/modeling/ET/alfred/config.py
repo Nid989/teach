@@ -13,7 +13,7 @@ SETTINGS.CONFIG.READ_ONLY_CONFIG = False
 def cfg_exp():
     # HIGH-LEVEL MODEL SETTINGS
     # where to save model and/or logs
-    name = "et_plus_bart_base"
+    name = "et_plus_bart_base_delete"
     # model to use
     model = "transformer"
     # which device to use
@@ -23,7 +23,7 @@ def cfg_exp():
     # we can fine-tune a pre-trained model
     pretrained_path = None
     # run the code on a small chunk of data
-    fast_epoch = True
+    fast_epoch = False
 
     # Set this to 1 if running on a Mac and to large numbers like 250 if running on EC2
     lmdb_max_readers = 1
@@ -31,7 +31,10 @@ def cfg_exp():
     # DATA SETTINGS
     data = {
         # dataset name(s) for training and validation
-        "train": "lmdb_teach_edh_all",
+        # ========================= Modifications ========================= #
+        # "train": "lmdb_teach_edh_all", # UNCOMMENT THIS
+        "train": "lmdb_teach_edh_maskrcnn_delte_1",
+        # ================================================================= #
         # additional dataset name(s) can be specified for validation only
         "valid": "",
         # specify the length of each dataset
@@ -111,7 +114,7 @@ def cfg_train():
 
     # HYPER PARAMETERS
     # batch size
-    batch = 8 #8
+    batch = 2 #8
     # number of epochs
     epochs = 20 #20
     # optimizer type, must be in ('adam', 'adamw')

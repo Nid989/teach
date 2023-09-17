@@ -82,6 +82,9 @@ class LearnedModel(nn.Module):
                 # do the forward passes
                 model_outs, losses_train = {}, {}
                 for batch_name, (traj_data, input_dict, gt_dict) in batches.items():
+                    print("input_dict", input_dict.keys())
+                    print("length_lang_max", input_dict["length_lang_max"])
+                    print("gt_dict", gt_dict)
                     if "lang" not in input_dict:
                         raise RuntimeError("In learned.run_train, lang not in input_dict")
                     model_outs[batch_name] = self.model.forward(

@@ -33,12 +33,15 @@ def cfg_args():
     data_input = "edh_instances"
     task_type = "edh"
     # whether to overwrite old data in case it exists
-    overwrite = False
+    overwrite = True # True: MAIN TRAINING
     # number of processes to run the data processing in (0 for main thread)
     num_workers = 0
     # debug run with only 16 entries
-    fast_epoch = False
-
+    # ========================= Modification ========================= # 
+    # TODO: change this to False
+    fast_epoch = False # False: MAIN TRAINING 
+    # ================================================================ # 
+    
     # VISUAL FEATURES SETTINGS
     # visual archi (resnet18, fasterrcnn, maskrcnn)
     visual_archi = "maskrcnn"
@@ -55,10 +58,10 @@ def cfg_args():
     # generate dataset with subgoal annotations instead of human annotations
     subgoal_ann = False
     # use an existing vocabulary if specified (None for starting from scratch)
-#     vocab_path = "files/base.vocab"
-    vocab_path = None
+    vocab_path = "project/teach/src/teach/modeling/ET/files/base.vocab"
+    # vocab_path = None
 
-
+    
 def process_feats(traj_paths, extractor, lock, image_folder, save_path):
     (save_path / "feats").mkdir(exist_ok=True)
     if str(save_path).endswith("/worker00"):
@@ -136,7 +139,8 @@ def get_traj_paths(input_path, processed_files_path, fast_epoch):
         traj_paths_all = sorted([str(path) for path in input_path.glob("*/*.json")])
         traj_paths = traj_paths_all
     if fast_epoch:
-        traj_paths = traj_paths[::20]
+        # traj_paths = traj_paths[::20]
+        traj_paths = traj_paths[::420]
     num_files = len(traj_paths)
     if processed_files_path is not None and processed_files_path.exists():
         if str(processed_files_path).endswith(constants.VOCAB_FILENAME):
@@ -167,37 +171,36 @@ def run_in_parallel(func, num_workers, output_path, args, use_processes=False):
         for thread in threads:
             thread.join()
 
-
-        
+            
 def gather_data(output_path, num_workers):
     for dirname in ("feats", "masks", "jsons"):
         if (output_path / dirname).is_dir():
             shutil.rmtree(output_path / dirname)
         (output_path / dirname).mkdir()
         
-#     for dirname in ("feats", "masks", "jsons"):
-#         for path_file in output_path.glob("worker*/{}/*".format(dirname)):
-#             if path_file.stat().st_size == 0:
-#                 continue
-#             path_symlink = output_path / dirname / path_file.name
-#             link_file = True
-#             if path_symlink.is_symlink():
-#                 # this file was already linked
-#                 if path_file.stat().st_size > path_symlink.stat().st_size:
-#                     # we should replace the previously linked file with a new one
-#                     link_file = True
-#                     path_symlink.unlink()
-#                 else:
-#                     # we should keep the previously linked file
-#                     link_file = False
-#             if link_file:
-#                 path_symlink.symlink_to(path_file)
+    # for dirname in ("feats", "masks", "jsons"):
+    #     for path_file in output_path.glob("worker*/{}/*".format(dirname)):
+    #         if path_file.stat().st_size == 0:
+    #             continue
+    #         path_symlink = output_path / dirname / path_file.name
+    #         link_file = True
+    #         if path_symlink.is_symlink():
+    #             # this file was already linked
+    #             if path_file.stat().st_size > path_symlink.stat().st_size:
+    #                 # we should replace the previously linked file with a new one
+    #                 link_file = True
+    #                 path_symlink.unlink()
+    #             else:
+    #                 # we should keep the previously linked file
+    #                 link_file = False
+    #         if link_file:
+    #             path_symlink.symlink_to(path_file)
 
     partitions = ("train", "valid_seen", "valid_unseen")
     if not (output_path / ".deleting_worker_dirs").exists():
         for partition in partitions:
             logger.info("Processing %s trajectories" % partition)
-#             feats_files = output_path.glob("feats/{}:*.pt".format(partition))
+            # feats_files = output_path.glob("feats/{}:*.pt".format(partition))
             feats_files = output_path.glob("worker00/feats/{}:*.pt".format(partition))
             feats_files = sorted([str(path) for path in feats_files])
             jsons_files = [p.replace("/feats/", "/jsons/").replace(".pt", ".pkl") for p in feats_files]
@@ -205,15 +208,15 @@ def gather_data(output_path, num_workers):
             data_util.gather_feats(feats_files, output_path / partition / "feats")
             data_util.gather_jsons(jsons_files, output_path / partition / "jsons.pkl")
 
-#     logger.info("Removing worker directories")
-#     (output_path / ".deleting_worker_dirs").touch()
-#     for worker_idx in range(max(num_workers, 1)):
-#         worker_dir = output_path / "worker{:02d}".format(worker_idx)
-#         shutil.rmtree(worker_dir)
-#     for dirname in ("feats", "masks", "jsons"):
-#         shutil.rmtree(output_path / dirname)
-#     os.remove(output_path / ".deleting_worker_dirs")
-#     os.remove(output_path / "processed_feats.txt")
+    # logger.info("Removing worker directories")
+    # (output_path / ".deleting_worker_dirs").touch()
+    # for worker_idx in range(max(num_workers, 1)):
+    #     worker_dir = output_path / "worker{:02d}".format(worker_idx)
+    #     shutil.rmtree(worker_dir)
+    # for dirname in ("feats", "masks", "jsons"):
+    #     shutil.rmtree(output_path / dirname)
+    # os.remove(output_path / ".deleting_worker_dirs")
+    # os.remove(output_path / "processed_feats.txt")
 
 
 @ex.automain
@@ -248,6 +251,7 @@ def main(args):
     # first process jsons and masks
     if len(trajs_list) > 0:
         lock = threading.Lock()
+        print("vocab_path", args.vocab_path)
         preprocessor = data_util.get_preprocessor(Preprocessor, args.subgoal_ann, lock, args.vocab_path, args.task_type)
         run_in_parallel(
             process_jsons,
