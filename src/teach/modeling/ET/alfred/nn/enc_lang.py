@@ -90,8 +90,7 @@ class EncoderLang(nn.Module):
         return emb_lang
 
 
-
-# ADD Bart Encoder class
+# BartModel class `Encoder-Decoder` architecture
 class EncoderLangBART(nn.Module):
     def __init__(
         self,
@@ -108,27 +107,17 @@ class EncoderLangBART(nn.Module):
 
         # BART-large model
         model_name = "facebook/bart-base"
-        # tokenizer = BartTokenizer.from_pretrained(model_name)
         self.bart_model = BartModel.from_pretrained(model_name)
-        # self.tokenizer = tokenizer
-
-        # self.enc_layernorm = nn.LayerNorm(args.demb)
-        # self.enc_dropout = nn.Dropout(args.dropout["lang"], inplace=True)
 
     def forward(self, lang_pad):
         """
         Encode language text using BART-large model
         """
-    
-        # Encode the input using BART
+        # encode the input using transformer.BartModel architecture (freeze)
         outputs = self.bart_model(lang_pad)
-        print(outputs)
         hiddens = outputs.encoder_last_hidden_state
-        print(hiddens.shape)
         
-        # Compute lengths of non-padded sequences
-        lengths = torch.tensor([lang_pad.shape[1]] * lang_pad.shape[0])
-        # lengths = (lang_pad != self.tokenizer.pad_token_id).sum(dim=1)
-
+        # compute lengths of non-padded sequences
+        lengths = (lang_pad != self.bart_model.config.pad_token_id).sum(dim=1)
         return hiddens, lengths
 

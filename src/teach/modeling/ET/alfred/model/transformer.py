@@ -24,9 +24,9 @@ class Model(base.Model):
         # pre-encoder for language tokens
         if args.encoder_type["TYPE"] == "BART":
             self.encoder_lang = EncoderLangBART(args.encoder_lang["layers"], args, embs_ann)
+            # freezing `BartModel` parameters/weights.
             for param in self.encoder_lang.parameters():
                 param.requires_grad = False
-            print(self.encoder_lang)    
             self.BART_FLAG = 1
         else:
             self.encoder_lang = EncoderLang(args.encoder_lang["layers"], args, embs_ann)
@@ -71,13 +71,9 @@ class Model(base.Model):
         # embed language
         output = {}
         if self.BART_FLAG:
-            print(inputs["lang"])
-            print(inputs["lang"].shape)
-            print(torch.max(inputs["lang"]))
             emb_lang, lengths_lang = self.embed_lang_bart(inputs["lang"])
         else:
             emb_lang, lengths_lang = self.embed_lang(inputs["lang"], vocab)
-        print("forward @ 79 completed")
         emb_lang = self.dataset_enc(emb_lang, vocab) if self.dataset_enc else emb_lang
 
         # embed frames and actions
