@@ -16,12 +16,15 @@ class Model(base.Model):
         transformer agent
         """
         super().__init__(args, embs_ann, vocab_out, pad, seg, for_inference)
-
+        
         # encoder and visual embeddings
         self.encoder_vl = EncoderVL(args)
         # pre-encoder for language tokens
         if args.encoder_type["TYPE"] == "BART":
             self.encoder_lang = EncoderLangBART(args.encoder_lang["layers"], args, embs_ann)
+            # freezing `BartModel` parameters/weights.
+            for param in self.encoder_lang.parameters():
+                param.requires_grad = False
             self.BART_FLAG = 1
         else:
             self.encoder_lang = EncoderLang(args.encoder_lang["layers"], args, embs_ann)

@@ -10,10 +10,16 @@ from tensorboardX import SummaryWriter
 from torch import nn
 from tqdm import tqdm
 
+from transformers import BartTokenizerFast
+
 from teach.logger import create_logger
 
 logger = create_logger(__name__, level=logging.INFO)
 
+# ========================= Modification ========================= # 
+tokenizer = BartTokenizerFast.from_pretrained("facebook/bart-base")
+max_lang_seq_length = tokenizer.max_model_input_sizes["facebook/bart-base"]
+# ================================================================ # 
 
 class LearnedModel(nn.Module):
     def __init__(self, args, embs_ann, vocab_out, for_inference=False):
@@ -81,20 +87,34 @@ class LearnedModel(nn.Module):
 
                 # do the forward passes
                 model_outs, losses_train = {}, {}
+                skip_batch = False # whether to skip-batch due to input-data discrepancy
                 for batch_name, (traj_data, input_dict, gt_dict) in batches.items():
+                    
+                    # max-sequence-length > max-input-length(`facebook/bart-base` i.e. 1024)
+                    if input_dict["length_lang_max"] > max_lang_seq_length:
+                        skip_batch = True
+                        # print("length_lang_max exceed triggered")
+                        # ========================= Modification ========================= #
+                        
+                        # ================================================================ #
+                        continue
+                        
                     if "lang" not in input_dict:
                         raise RuntimeError("In learned.run_train, lang not in input_dict")
                     model_outs[batch_name] = self.model.forward(
                         vocabs_in[batch_name.split(":")[-1]], action=gt_dict["action"], **input_dict
                     )
                     info["iters"]["train"] += len(traj_data) if ":" not in batch_name else 0
+                
+                if skip_batch == True:
+                    continue 
+                
                 gt.stamp("forward pass", unique=False)
                 # compute losses
                 losses_train = self.model.compute_loss(
                     model_outs,
                     {key: gt_dict for key, (_, _, gt_dict) in batches.items()},
                 )
-
                 # do the gradient step
                 optimizer.zero_grad()
                 sum_loss = sum([sum(loss.values()) for name, loss in losses_train.items()])
