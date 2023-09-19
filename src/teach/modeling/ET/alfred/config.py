@@ -13,7 +13,7 @@ SETTINGS.CONFIG.READ_ONLY_CONFIG = False
 def cfg_exp():
     # HIGH-LEVEL MODEL SETTINGS
     # where to save model and/or logs
-    name = "et_plus_bart_base_delete"
+    name = "et_plus_bart_base_fasterrcnn"
     # model to use
     model = "transformer"
     # which device to use
@@ -32,11 +32,10 @@ def cfg_exp():
     data = {
         # dataset name(s) for training and validation
         # ========================= Modifications ========================= #
-        # "train": "lmdb_teach_edh_all", # UNCOMMENT THIS
-        "train": "lmdb_teach_edh_maskrcnn_delte_1",
+        "train": "lmdb_teach_edh_fasterrcnn",
         # ================================================================= #
         # additional dataset name(s) can be specified for validation only
-        "valid": "",
+        "valid": "lmdb_teach_edh_fasterrcnn",
         # specify the length of each dataset
         "length": 30000,
         # what to use as annotations: {'lang', 'lang_frames', 'frames'}

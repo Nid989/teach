@@ -108,7 +108,7 @@ class EncoderLangBART(nn.Module):
         # BART-large model
         model_name = "facebook/bart-base"
         self.bart_model = BartModel.from_pretrained(model_name)
-
+        
     def forward(self, lang_pad):
         """
         Encode language text using BART-large model
@@ -119,5 +119,6 @@ class EncoderLangBART(nn.Module):
         
         # compute lengths of non-padded sequences
         lengths = (lang_pad != self.bart_model.config.pad_token_id).sum(dim=1)
+        # lengths = torch.tensor([lang_pad.shape[1]] * lang_pad.shape[0])
         return hiddens, lengths
 

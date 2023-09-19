@@ -16,8 +16,6 @@ class Model(base.Model):
         transformer agent
         """
         super().__init__(args, embs_ann, vocab_out, pad, seg, for_inference)
-
-        print("vocab @ Model class constructor", vocab_out)
         
         # encoder and visual embeddings
         self.encoder_vl = EncoderVL(args)
@@ -65,8 +63,6 @@ class Model(base.Model):
         """
         forward the model for multiple time-steps (used for training)
         """
-        
-        print("vocab @ forward function", vocab)
         
         # embed language
         output = {}
