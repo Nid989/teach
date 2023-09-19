@@ -9,7 +9,7 @@ from alfred.utils import data_util, model_util
 from tensorboardX import SummaryWriter
 from torch import nn
 from tqdm import tqdm
-
+import torch
 from transformers import BartTokenizerFast
 
 from teach.logger import create_logger
@@ -92,12 +92,12 @@ class LearnedModel(nn.Module):
                     
                     # max-sequence-length > max-input-length(`facebook/bart-base` i.e. 1024)
                     if input_dict["length_lang_max"] > max_lang_seq_length:
-                        skip_batch = True
                         # print("length_lang_max exceed triggered")
                         # ========================= Modification ========================= #
-                        
+                        input_dict["lang"] = input_dict["lang"][:, :max_lang_seq_length]
+                        input_dict["lengths_lang"][input_dict["lengths_lang"] > max_lang_seq_length] = max_lang_seq_length
+                        input_dict["length_lang_max"] = torch.tensor([max_lang_seq_length], dtype=torch.int64)
                         # ================================================================ #
-                        continue
                         
                     if "lang" not in input_dict:
                         raise RuntimeError("In learned.run_train, lang not in input_dict")
@@ -105,9 +105,6 @@ class LearnedModel(nn.Module):
                         vocabs_in[batch_name.split(":")[-1]], action=gt_dict["action"], **input_dict
                     )
                     info["iters"]["train"] += len(traj_data) if ":" not in batch_name else 0
-                
-                if skip_batch == True:
-                    continue 
                 
                 gt.stamp("forward pass", unique=False)
                 # compute losses
