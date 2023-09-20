@@ -82,8 +82,9 @@ class LearnedModel(nn.Module):
             train_iterators = {key: iter(loader) for key, loader in loaders_train.items()}
             metrics = {key: collections.defaultdict(list) for key in loaders_train}
             gt.reset()
-
-            for _ in tqdm(range(epoch_length), desc="train"):
+            
+            pbar = tqdm(range(epoch_length), desc="Training Iteration")
+            for _ in pbar:
                 # sample batches
                 batches = data_util.sample_batches(train_iterators, self.args.device, self.pad, self.args)
                 gt.stamp("data fetching", unique=False)
@@ -124,6 +125,9 @@ class LearnedModel(nn.Module):
                 # do the gradient step
                 optimizer.zero_grad()
                 sum_loss = sum([sum(loss.values()) for name, loss in losses_train.items()])
+                # print(sum_loss, type(sum_loss))
+                pbar.set_description('train_loss={0:.3f}'.format(sum_loss.item()))
+                
                 sum_loss.backward()
                 optimizer.step()
                 gt.stamp("optimizer", unique=False)

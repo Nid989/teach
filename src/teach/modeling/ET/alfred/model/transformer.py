@@ -20,7 +20,7 @@ class Model(base.Model):
         # encoder and visual embeddings
         self.encoder_vl = EncoderVL(args)
         # pre-encoder for language tokens
-        if args.encoder_type["TYPE"] == "BART":
+        if args.use_bart_model == True:
             self.encoder_lang = EncoderLangBART(args)
             # freezing `BartModel` parameters/weights.
             for param in self.encoder_lang.parameters():
