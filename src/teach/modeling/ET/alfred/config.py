@@ -44,9 +44,8 @@ def cfg_exp():
         # replacement and "shuffle" results in iterating through the train dataset in random order per epoch
         "train_load_type": "shuffle",
     }
-
-    lang_pretrain_over_history_subgoals = False
-
+    
+    lang_pretrain_over_history_subgoals = False 
 
 @eval_ingredient.config
 def cfg_eval():
@@ -108,14 +107,16 @@ def cfg_train():
     profile = False
 
     # For ablations
+    # ========================= Modifications ========================= # 
     no_lang = False
-    no_vision = False
+    no_vision = False # `True` or `False`
+    # ================================================================= # 
 
     # HYPER PARAMETERS
     # batch size
-    batch = 2 #8
+    batch = 2 # `baseline batch-size` = 8
     # number of epochs
-    epochs = 21 #20
+    epochs = 20 # `baseline epochs` = 20
     # optimizer type, must be in ('adam', 'adamw')
     optimizer = "adamw"
     # L2 regularization weight
@@ -141,6 +142,11 @@ def cfg_train():
         # initial learning rate will be divided by this value
         "warmup_scale": 1,
     }
+    # ========================= Modifications ========================= # 
+    # Only for experimental basis make `action_loss_wt` & `object_loss_wt` 
+    # learnable and determine how the model automatically emphasize either of them.
+    learn_action_object_loss_wt = True
+    # ================================================================= # 
     # weight of action loss
     action_loss_wt = 1.0
     # weight of object loss
@@ -153,15 +159,17 @@ def cfg_train():
     progress_aux_loss_wt = 0
     # maximizing entropy loss (by default it is off)
     entropy_wt = 0.0
-
+    
+    # ========================= Modifications ========================= # 
     # Should train loss be computed over history actions? (default False)
-    compute_train_loss_over_history = True
-
+    compute_train_loss_over_history = True # `True` or `False`
+    # ================================================================= # 
+    
     # TRANSFORMER settings
     # size of transformer embeddings
-    demb = 768 #1024 (LARGE)
+    demb = 768 
     # number of heads in multi-head attention
-    encoder_heads = 12 #16
+    encoder_heads = 12 
     # number of layers in transformer encoder
     encoder_layers = 2
     # how many previous actions to use as input
@@ -183,7 +191,13 @@ def cfg_train():
     }
     # do not propagate gradients to the look-up table and the language encoder
     detach_lang_emb = False
-
+    # ========================= Modifications ========================= # 
+    # model-checkpoint for language-model 
+    lang_model_checkpoint = "facebook/bart-base" # `facebook/bart-base` or `Koshti10/BART-base-ET-synthetic` (Synthetic fine-tuning)
+    # whether to utilize encoder_hidden_state or last_hidden_state
+    use_lang_encoder_last_hidden_state = False # `True` (outputs.encoder_last_hidden_state) or `False` (outputs.last_hidden_state)
+    # ================================================================= # 
+    
     # DROPOUTS
     dropout = {
         # dropout rate for language (goal + instr)

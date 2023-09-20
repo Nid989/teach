@@ -38,6 +38,9 @@ class LearnedModel(nn.Module):
         ModelClass = import_module("alfred.model.{}".format(args.model)).Model
         self.model = ModelClass(args, embs_ann, vocab_out, self.pad, self.seg, for_inference)
 
+        print(self.model)
+        print(f"total trainable parameters: {sum(p.numel() for p in self.model.parameters() if p.requires_grad)}")
+        
     def run_train(self, loaders, info, optimizer=None):
         """
         training loop
@@ -88,16 +91,19 @@ class LearnedModel(nn.Module):
                 # do the forward passes
                 model_outs, losses_train = {}, {}
                 skip_batch = False # whether to skip-batch due to input-data discrepancy
+                skip_batch = False
                 for batch_name, (traj_data, input_dict, gt_dict) in batches.items():
                     
                     # max-sequence-length > max-input-length(`facebook/bart-base` i.e. 1024)
                     if input_dict["length_lang_max"] > max_lang_seq_length:
                         # print("length_lang_max exceed triggered")
+                        skip_batch = True
                         # ========================= Modification ========================= #
                         input_dict["lang"] = input_dict["lang"][:, :max_lang_seq_length]
                         input_dict["lengths_lang"][input_dict["lengths_lang"] > max_lang_seq_length] = max_lang_seq_length
                         input_dict["length_lang_max"] = torch.tensor([max_lang_seq_length], dtype=torch.int64)
                         # ================================================================ #
+                        continue
                         
                     if "lang" not in input_dict:
                         raise RuntimeError("In learned.run_train, lang not in input_dict")
@@ -105,6 +111,9 @@ class LearnedModel(nn.Module):
                         vocabs_in[batch_name.split(":")[-1]], action=gt_dict["action"], **input_dict
                     )
                     info["iters"]["train"] += len(traj_data) if ":" not in batch_name else 0
+                
+                if skip_batch == True:
+                    continue
                 
                 gt.stamp("forward pass", unique=False)
                 # compute losses
@@ -133,6 +142,10 @@ class LearnedModel(nn.Module):
                 gt.stamp("metrics", unique=False)
                 if self.args.profile:
                     logger.info(gt.report(include_itrs=False, include_stats=False))
+
+            # display learned weighing parameters for `action_loss` & `object_loss`
+            if self.args.learn_action_object_loss_wt:
+                print(f"Learned priority weights for action_loss: {self.model.action_loss_wt} & object_loss: {self.model.object_loss_wt}") 
 
             # save the checkpoint
             logger.info("Saving models...")

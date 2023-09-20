@@ -98,27 +98,26 @@ class EncoderLangBART(nn.Module):
         subgoal_token="<<instr>>",
         goal_token="<<goal>>",
     ):
-        """
-        BART-large encoder for language inputs
-        """
         super(EncoderLangBART, self).__init__()
+        self.args = args
         self.subgoal_token = subgoal_token
         self.goal_token = goal_token
-
-        # BART-large model
-        model_name = "facebook/bart-base"
-        self.bart_model = BartModel.from_pretrained(model_name)
+        
+        # initialize language encoder (BART)
+        self.bart_model = BartModel.from_pretrained(args.lang_model_checkpoint)
         
     def forward(self, lang_pad):
         """
-        Encode language text using BART-large model
+        encode the lang-input via the bart-model with possibility to either utilize 
+        `encoder_last_hidden_state` or `last_hidden_state` (decoder)
         """
-        # encode the input using transformer.BartModel architecture (freeze)
+        # encode the input using transformers.BartModel architecture (freeze)
         outputs = self.bart_model(lang_pad)
-        hiddens = outputs.encoder_last_hidden_state
-        
+        if self.args.use_lang_encoder_last_hidden_state:
+            hiddens = outputs.encoder_last_hidden_state
+        else:
+            hiddens = outputs.last_hidden_state
         # compute lengths of non-padded sequences
         lengths = (lang_pad != self.bart_model.config.pad_token_id).sum(dim=1)
-        # lengths = torch.tensor([lang_pad.shape[1]] * lang_pad.shape[0])
         return hiddens, lengths
 
