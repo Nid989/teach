@@ -9,7 +9,7 @@ from alfred.utils import data_util, model_util
 from tensorboardX import SummaryWriter
 from torch import nn
 from tqdm import tqdm
-
+import torch
 from transformers import BartTokenizerFast
 
 from teach.logger import create_logger
@@ -38,6 +38,9 @@ class LearnedModel(nn.Module):
         ModelClass = import_module("alfred.model.{}".format(args.model)).Model
         self.model = ModelClass(args, embs_ann, vocab_out, self.pad, self.seg, for_inference)
 
+        print(self.model)
+        print(f"total trainable parameters: {sum(p.numel() for p in self.model.parameters() if p.requires_grad)}")
+        
     def run_train(self, loaders, info, optimizer=None):
         """
         training loop
@@ -79,8 +82,9 @@ class LearnedModel(nn.Module):
             train_iterators = {key: iter(loader) for key, loader in loaders_train.items()}
             metrics = {key: collections.defaultdict(list) for key in loaders_train}
             gt.reset()
-
-            for _ in tqdm(range(epoch_length), desc="train"):
+            
+            pbar = tqdm(range(epoch_length), desc="Training Iteration")
+            for _ in pbar:
                 # sample batches
                 batches = data_util.sample_batches(train_iterators, self.args.device, self.pad, self.args)
                 gt.stamp("data fetching", unique=False)
@@ -88,14 +92,17 @@ class LearnedModel(nn.Module):
                 # do the forward passes
                 model_outs, losses_train = {}, {}
                 skip_batch = False # whether to skip-batch due to input-data discrepancy
+                skip_batch = False
                 for batch_name, (traj_data, input_dict, gt_dict) in batches.items():
                     
                     # max-sequence-length > max-input-length(`facebook/bart-base` i.e. 1024)
                     if input_dict["length_lang_max"] > max_lang_seq_length:
-                        skip_batch = True
                         # print("length_lang_max exceed triggered")
+                        skip_batch = True
                         # ========================= Modification ========================= #
-                        
+                        input_dict["lang"] = input_dict["lang"][:, :max_lang_seq_length]
+                        input_dict["lengths_lang"][input_dict["lengths_lang"] > max_lang_seq_length] = max_lang_seq_length
+                        input_dict["length_lang_max"] = torch.tensor([max_lang_seq_length], dtype=torch.int64)
                         # ================================================================ #
                         continue
                         
@@ -107,7 +114,7 @@ class LearnedModel(nn.Module):
                     info["iters"]["train"] += len(traj_data) if ":" not in batch_name else 0
                 
                 if skip_batch == True:
-                    continue 
+                    continue
                 
                 gt.stamp("forward pass", unique=False)
                 # compute losses
@@ -118,6 +125,9 @@ class LearnedModel(nn.Module):
                 # do the gradient step
                 optimizer.zero_grad()
                 sum_loss = sum([sum(loss.values()) for name, loss in losses_train.items()])
+                # print(sum_loss, type(sum_loss))
+                pbar.set_description('train_loss={0:.3f}'.format(sum_loss.item()))
+                
                 sum_loss.backward()
                 optimizer.step()
                 gt.stamp("optimizer", unique=False)
@@ -136,6 +146,10 @@ class LearnedModel(nn.Module):
                 gt.stamp("metrics", unique=False)
                 if self.args.profile:
                     logger.info(gt.report(include_itrs=False, include_stats=False))
+
+            # display learned weighing parameters for `action_loss` & `object_loss`
+            if self.args.learn_action_object_loss_wt:
+                print(f"Learned priority weights for action_loss: {self.model.action_loss_wt} & object_loss: {self.model.object_loss_wt}") 
 
             # save the checkpoint
             logger.info("Saving models...")
